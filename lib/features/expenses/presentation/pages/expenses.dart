@@ -36,9 +36,9 @@ class _MyExpensesScreenState extends State<MyExpensesScreen> {
 
   @override
   void initState() {
-    monthValue=DateTime.now().month;
+    monthValue = DateTime.now().month;
     context.read<ExpenseBloc>().add(FilterEvent(month: monthValue));
-    filterDate=month[monthValue-1];
+    filterDate = month[monthValue - 1];
     super.initState();
   }
 
@@ -86,9 +86,15 @@ class _MyExpensesScreenState extends State<MyExpensesScreen> {
             child: BlocBuilder<ExpenseBloc, ExpenseState>(
               builder: (context, state) {
                 return DropdownButton(
+                    style: TextStyle(color: Colors.white),
                     value: filterDate,
                     items: month
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .map((e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(
+                              e,
+                              style: TextStyle(color: Colors.orangeAccent),
+                            )))
                         .toList(),
                     onChanged: (value) {
                       setState(() {
@@ -114,7 +120,8 @@ class _MyExpensesScreenState extends State<MyExpensesScreen> {
                       currentExpenses = state.expenses
                           .where((element) => !element.futureExpense)
                           .toList();
-                      currentExpenses.sort(((a, b) => a.date.compareTo(b.date)));
+                      currentExpenses
+                          .sort(((a, b) => a.date.compareTo(b.date)));
                       if (currentExpenses.isEmpty) {
                         return const Center(
                             child: Text('No completed expenses found'));
@@ -124,7 +131,8 @@ class _MyExpensesScreenState extends State<MyExpensesScreen> {
                           itemBuilder: (context, index) {
                             Expense expense = currentExpenses[index];
                             return Dismissible(
-                              movementDuration: const Duration(milliseconds: 100),
+                              movementDuration:
+                                  const Duration(milliseconds: 100),
                               background: Container(
                                 color: Colors.red,
                                 child: const Icon(Icons.delete),
@@ -184,7 +192,8 @@ class _MyExpensesScreenState extends State<MyExpensesScreen> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => AddExpenseScreen(
+                                          builder: (context) =>
+                                              AddExpenseScreen(
                                                 index: index,
                                                 forUpdate: true,
                                                 expense: expense,
@@ -221,7 +230,9 @@ class _MyExpensesScreenState extends State<MyExpensesScreen> {
             trailing: BlocBuilder<ExpenseBloc, ExpenseState>(
               builder: (context, state) {
                 if (state is ExpensesLoaded) {
-                  calculateTotal(state.expenses.where((element) => !element.futureExpense).toList());
+                  calculateTotal(state.expenses
+                      .where((element) => !element.futureExpense)
+                      .toList());
                   return Text('Rs. $totalExpenses');
                 } else {
                   return const Text('...');

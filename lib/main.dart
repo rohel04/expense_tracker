@@ -16,12 +16,12 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 
-void main(List<String> args) async{
+void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final appDocumentDirectory=await getApplicationDocumentsDirectory();
+  final appDocumentDirectory = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentDirectory.path);
   Hive.registerAdapter(ExpenseAdapter());
   Hive.registerAdapter(IncomeAdapter());
@@ -41,7 +41,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void dispose() {
     Hive.close();
@@ -52,25 +51,24 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<ExpenseBloc>(create:(context)=>ExpenseBloc()),
-        BlocProvider<IncomeBloc>(create:(context)=>IncomeBloc()),
-        BlocProvider<CategoryBloc>(create:(context)=>CategoryBloc()),
+        BlocProvider<ExpenseBloc>(create: (context) => ExpenseBloc()),
+        BlocProvider<IncomeBloc>(create: (context) => IncomeBloc()),
+        BlocProvider<CategoryBloc>(create: (context) => CategoryBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: StreamBuilder<User?>(
           stream: FirebaseAuth.instance.userChanges(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            if(snapshot.connectionState==ConnectionState.active)
-            {
-              var user=snapshot.data;
-              if(user==null){
+            if (snapshot.connectionState == ConnectionState.active) {
+              var user = snapshot.data;
+              if (user == null) {
                 return const LoginScreen();
-              }else{
+              } else {
                 return const MainScreen();
                 // return const MainScreen();
               }
-            }else{
+            } else {
               return const Center(
                 child: CircularProgressIndicator(),
               );
@@ -78,14 +76,12 @@ class _MyAppState extends State<MyApp> {
           },
         ),
         theme: ThemeData(
-          appBarTheme: AppBarTheme(
-            backgroundColor: ColorUtil.kPrmiaryColor,
-            elevation: 0.0
-          ),
-          textTheme: Theme.of(context).textTheme.apply(
-            bodyColor: ColorUtil.kTextColor
-          )
-        ),
+            useMaterial3: false,
+            appBarTheme: AppBarTheme(
+                backgroundColor: ColorUtil.kPrmiaryColor, elevation: 0.0),
+            textTheme: Theme.of(context)
+                .textTheme
+                .apply(bodyColor: ColorUtil.kTextColor, fontFamily: "Archivo")),
       ),
     );
   }

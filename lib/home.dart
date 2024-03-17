@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:expense_tracker/common/datasource/sync_datasource.dart';
 import 'package:expense_tracker/features/category/presentation/bloc/category_bloc.dart';
 import 'package:expense_tracker/features/category/presentation/pages/category_page.dart';
@@ -56,7 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: ColorUtil.kPrmiaryColor,
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text(
+          'Home',
+        ),
         actions: [
           IconButton(
               onPressed: () async {
@@ -66,7 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 await shared.clear();
                 navigate();
               },
-              icon: const Icon(Icons.logout))
+              icon: const Icon(
+                Icons.logout,
+              ))
         ],
       ),
       drawer: Drawer(
@@ -76,13 +78,19 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               ListTile(
                 onTap: () async {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Syncing data')));
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Syncing data')));
                   SyncRemoteDataSource a = SyncRemoteDataSourceImpl();
-                  var result= await a.syncExpenses();
-                  if(result){
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Data Synced'),backgroundColor: Colors.green));
-                  }else{
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Data syncing failed'),backgroundColor: Colors.red,));
+                  var result = await a.syncExpenses();
+                  if (result) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Data Synced'),
+                        backgroundColor: Colors.green));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Data syncing failed'),
+                      backgroundColor: Colors.red,
+                    ));
                   }
                 },
                 title: const Text('Save data to firebase'),
@@ -170,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                         valueListenable: totalBalances,
                       ),
-                      SizedBox(height: height * 0.05),
+                      SizedBox(height: height * 0.02),
                       const Text(
                         'Total',
                         style: TextStyle(fontSize: 16),
@@ -187,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Row(
                                   children: const [
                                     Icon(
-                                      Icons.arrow_drop_up,
+                                      Icons.arrow_drop_down,
                                       size: 20,
                                       color: Colors.green,
                                     ),
@@ -218,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Row(
                                   children: const [
                                     Icon(
-                                      Icons.arrow_drop_down,
+                                      Icons.arrow_drop_up,
                                       size: 20,
                                       color: Colors.red,
                                     ),
@@ -253,17 +261,23 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 50),
               BlocBuilder<ExpenseBloc, ExpenseState>(
                 builder: (context, state) {
-                  if(state is ExpensesLoaded){
-                    var currentExpenses=state.expenses.where((element)=>!element.futureExpense).toList();
-                  var total = 0;
+                  if (state is ExpensesLoaded) {
+                    var currentExpenses = state.expenses
+                        .where((element) => !element.futureExpense)
+                        .toList();
+                    var total = 0;
                     for (var i in currentExpenses) {
                       total = total + int.parse(i.amount);
                     }
-                    var totall=double.parse(totalIncom!)-total;
-                    return Text('Your must have $totall for your future expense this month',style: const TextStyle(fontSize: 16,fontWeight: FontWeight.bold),);
-                  }else{
-                  return const SizedBox();
-                }
+                    var totall = double.parse(totalIncom!) - total;
+                    return Text(
+                      'Your must have $totall for your future expense this month',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
                 },
               ),
               const SizedBox(height: 30),
@@ -273,14 +287,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: BlocBuilder<ExpenseBloc, ExpenseState>(
                     builder: (context, state) {
                   if (state is ExpensesLoaded) {
-                    if(state.expenses.isNotEmpty){
+                    if (state.expenses.isNotEmpty) {
                       Map<String, double>? dataMap = {};
                       for (var element in state.expenses) {
-                        if(element.category!=null){
+                        if (element.category != null) {
                           if (dataMap.containsKey(element.category!)) {
-                            dataMap[element.category!] =dataMap[element.category!]! +double.parse(element.amount);
+                            dataMap[element.category!] =
+                                dataMap[element.category!]! +
+                                    double.parse(element.amount);
                           } else {
-                            dataMap[element.category!] =double.parse(element.amount);
+                            dataMap[element.category!] =
+                                double.parse(element.amount);
                           }
                         }
                       }
@@ -296,9 +313,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             showLegendsInRow: false,
                             legendPosition: LegendPosition.right,
                             showLegends: true,
-                          )
-                        );
-                    }else{
+                          ));
+                    } else {
                       return const Text('No expenses found');
                     }
                   } else {
@@ -312,7 +328,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-    
     );
   }
 
