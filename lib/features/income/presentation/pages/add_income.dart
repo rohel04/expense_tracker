@@ -159,8 +159,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                     title: _titleController.text,
                                     futureIncome: futureIncome,
                                     amount: _amountController.text,
-                                    date: _dateController.text,
-                                    isSynced: false)))
+                                    date: _dateController.text)))
                             : [
                                 uuid = const Uuid().v4(),
                                 context.read<IncomeBloc>().add(AddIncomeEvent(
@@ -169,8 +168,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                         amount: _amountController.text,
                                         date: _dateController.text,
                                         futureIncome: futureIncome,
-                                        id: uuid,
-                                        isSynced: false)))
+                                        id: uuid)))
                               ];
                       },
                       child: Text(

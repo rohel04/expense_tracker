@@ -1,10 +1,8 @@
 import 'dart:developer';
 
 import 'package:expense_tracker/common/datasource/sync_datasource.dart';
-import 'package:expense_tracker/fetch.dart';
 import 'package:expense_tracker/utils/color_util.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,7 +12,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  var user = '';
   bool isLoading = false;
 
   @override
@@ -40,13 +37,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         elevation: 0.0,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50))),
-                    onPressed: () async {
-                      await getData();
-                      // if(user.isNotEmpty){
-                      //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>FetchScreen(userId: user)), (route) => false);
-                      //   // Navigator
-                      // }
-                    },
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                            await _signIn();
+                          },
                     child: isLoading
                         ? const SizedBox(
                             height: 30,
@@ -62,9 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 height: 35,
                                 width: 35,
                               ),
-                              const SizedBox(
-                                width: 10,
-                              ),
+                              const SizedBox(width: 10),
                               const Text(
                                 'Sign with google',
                                 style: TextStyle(color: Colors.black),
@@ -79,31 +72,15 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  navigate() {
-    print(user);
-    if (user.isNotEmpty) {
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => FetchScreen(userId: user)),
-          (route) => false);
-    }
-  }
-
-  getData() async {
+  Future<void> _signIn() async {
     SyncRemoteDataSource a = SyncRemoteDataSourceImpl();
     setState(() {
       isLoading = true;
     });
     var result = await a.signInGoogle();
-    result.fold((result) async {
-      log(result.toString());
-      var shared = await SharedPreferences.getInstance();
-      await shared.setString('user', result.user!.uid);
-      setState(() {
-        user = result.user!.uid;
-        isLoading = false;
-      });
-      navigate();
+    result.fold((credential) {
+      log(credential.toString());
+      // FirebaseAuth.instance.userChanges() in main.dart handles routing
     }, (r) {
       setState(() {
         isLoading = false;

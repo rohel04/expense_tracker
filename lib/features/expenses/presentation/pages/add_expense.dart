@@ -1,4 +1,3 @@
-import 'package:expense_tracker/features/category/data/datasources/local/category.dart';
 import 'package:expense_tracker/features/category/presentation/bloc/category_bloc.dart';
 import 'package:expense_tracker/features/expenses/data/datasources/local/expense.dart';
 import 'package:expense_tracker/features/expenses/presentation/bloc/expense_bloc/expense_bloc.dart';
@@ -202,8 +201,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                                         amount: _amountController.text,
                                         futureExpense: futureExpense,
                                         category: selectedCat,
-                                        date: _dateController.text,
-                                        isSynced: false)))
+                                        date: _dateController.text)))
                             : [
                                 uuid = const Uuid().v4(),
                                 context.read<ExpenseBloc>().add(AddExpenseEvent(
@@ -213,8 +211,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                                         futureExpense: futureExpense,
                                         date: _dateController.text,
                                         category: selectedCat,
-                                        id: uuid,
-                                        isSynced: false)))
+                                        id: uuid)))
                               ];
                       },
                       child: Text(widget.forUpdate!

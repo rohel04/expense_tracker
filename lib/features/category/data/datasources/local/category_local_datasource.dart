@@ -1,43 +1,52 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/features/category/data/datasources/local/category.dart';
-import 'package:expense_tracker/utils/box_constants.dart';
-import 'package:hive/hive.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-abstract class CategoryLocalDataSource{
-  Future<List<Category>> addCategory(id,category);
+abstract class CategoryLocalDataSource {
+  Future<List<Category>> addCategory(id, category);
   Future<List<Category>> updateCategory(category);
   Future<List<Category>> deleteCategory(id);
   Future<List<Category>> getCategories();
 }
 
-class CategoryLocalDataSourceImpl implements CategoryLocalDataSource{
-  @override
-  Future<List<Category>> addCategory(id,category) async{
-    final categoryBox=Hive.box<Category>(kCategoryBox);
-    await categoryBox.put(id, category);
-    var categories=getCategories();
-    return categories;
+class CategoryLocalDataSourceImpl implements CategoryLocalDataSource {
+  CollectionReference<Map<String, dynamic>> _collection() {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    return FirebaseFirestore.instance
+        .collection('categories')
+        .doc(uid)
+        .collection('mycategories');
   }
 
   @override
-  Future<List<Category>> deleteCategory(id) async{
-    // TODO: implement deleteCategory
+  Future<List<Category>> addCategory(id, category) async {
+    await _collection().doc(id).set({
+      'id': category.id,
+      'title': category.title,
+    });
+    return getCategories();
+  }
+
+  @override
+  Future<List<Category>> deleteCategory(id) async {
+    await _collection().doc(id).delete();
+    return getCategories();
+  }
+
+  @override
+  Future<List<Category>> updateCategory(category) async {
     throw UnimplementedError();
   }
 
   @override
-  Future<List<Category>> updateCategory(category) async{
-    // TODO: implement updateCategory
-    throw UnimplementedError();
-  }
-  
-  @override
-  Future<List<Category>> getCategories() async{
-    try{
-      final categoryBox=Hive.box<Category>(kCategoryBox);
-      return categoryBox.values.map((e) => Category(id: e.id, title: e.title)).toList();
-    }catch(e){
+  Future<List<Category>> getCategories() async {
+    try {
+      final snapshot = await _collection().get();
+      return snapshot.docs
+          .map((doc) => Category(id: doc['id'], title: doc['title']))
+          .toList();
+    } catch (e) {
       throw Exception();
     }
   }
-
 }

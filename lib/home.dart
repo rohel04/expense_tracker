@@ -5,14 +5,12 @@ import 'package:expense_tracker/features/expenses/data/datasources/local/expense
 import 'package:expense_tracker/features/expenses/presentation/bloc/expense_bloc/expense_bloc.dart';
 import 'package:expense_tracker/features/income/data/datasources/local/income.dart';
 import 'package:expense_tracker/features/income/presentation/bloc/income_bloc/income_bloc.dart';
-import 'package:expense_tracker/fetch.dart';
 import 'package:expense_tracker/login_screen.dart';
 import 'package:expense_tracker/utils/color_util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pie_chart/pie_chart.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -62,8 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () async {
                 SyncRemoteDataSource a = SyncRemoteDataSourceImpl();
                 await a.logout();
-                var shared = await SharedPreferences.getInstance();
-                await shared.clear();
                 navigate();
               },
               icon: const Icon(
@@ -76,37 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              ListTile(
-                onTap: () async {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text('Syncing data')));
-                  SyncRemoteDataSource a = SyncRemoteDataSourceImpl();
-                  var result = await a.syncExpenses();
-                  if (result) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Data Synced'),
-                        backgroundColor: Colors.green));
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Data syncing failed'),
-                      backgroundColor: Colors.red,
-                    ));
-                  }
-                },
-                title: const Text('Save data to firebase'),
-              ),
-              ListTile(
-                onTap: () {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FetchScreen(
-                                userId: FirebaseAuth.instance.currentUser!.uid,
-                              )),
-                      (route) => false);
-                },
-                title: const Text('Get previous data from firebase'),
-              ),
               ListTile(
                 onTap: () {
                   Navigator.push(
