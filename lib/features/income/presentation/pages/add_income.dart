@@ -148,8 +148,11 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 const SizedBox(height: 20),
                 SizedBox(
                   height: 50,
-                  child: ElevatedButton(
-                      onPressed: () {
+                  child: BlocBuilder<IncomeBloc, IncomeState>(
+                    builder: (context, state) {
+                  final loading = state is IncomeLoading;
+                  return ElevatedButton(
+                      onPressed: loading ? null : () {
                         String uuid = '';
                         widget.forUpdate!
                             ? context.read<IncomeBloc>().add(UpdateIncomeEvent(
@@ -171,8 +174,16 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                         id: uuid)))
                               ];
                       },
-                      child: Text(
-                          widget.forUpdate! ? 'Update Income' : 'Add Income')),
+                      child: loading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2))
+                          : Text(widget.forUpdate!
+                              ? 'Update Income'
+                              : 'Add Income'));
+                    },
+                  ),
                 )
               ],
             ),

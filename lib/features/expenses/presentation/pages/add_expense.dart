@@ -188,8 +188,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 const SizedBox(height: 20),
                 SizedBox(
                   height: 50,
-                  child: ElevatedButton(
-                      onPressed: () async {
+                  child: BlocBuilder<ExpenseBloc, ExpenseState>(
+                    builder: (context, state) {
+                  final loading = state is ExpensesLoading;
+                  return ElevatedButton(
+                      onPressed: loading ? null : () async {
                         String uuid = '';
                         widget.forUpdate!
                             ? context.read<ExpenseBloc>().add(
@@ -214,9 +217,16 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                                         id: uuid)))
                               ];
                       },
-                      child: Text(widget.forUpdate!
-                          ? 'Update Expense'
-                          : 'Add Expense')),
+                      child: loading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2))
+                          : Text(widget.forUpdate!
+                              ? 'Update Expense'
+                              : 'Add Expense'));
+                    },
+                  ),
                 )
               ],
             ),

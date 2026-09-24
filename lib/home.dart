@@ -3,6 +3,7 @@ import 'package:expense_tracker/features/category/presentation/bloc/category_blo
 import 'package:expense_tracker/features/category/presentation/pages/category_page.dart';
 import 'package:expense_tracker/features/expenses/data/datasources/local/expense.dart';
 import 'package:expense_tracker/features/expenses/presentation/bloc/expense_bloc/expense_bloc.dart';
+import 'package:expense_tracker/features/expenses/presentation/pages/expense_chart_page.dart';
 import 'package:expense_tracker/features/income/data/datasources/local/income.dart';
 import 'package:expense_tracker/features/income/presentation/bloc/income_bloc/income_bloc.dart';
 import 'package:expense_tracker/login_screen.dart';
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? totalIncom = '0';
   int totalBalance = 0;
   String fullName = '';
+  bool _loggingOut = false;
   ValueNotifier totalBalances = ValueNotifier<int>(0);
 
   @override
@@ -57,14 +59,27 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-              onPressed: () async {
-                SyncRemoteDataSource a = SyncRemoteDataSourceImpl();
-                await a.logout();
-                navigate();
-              },
-              icon: const Icon(
-                Icons.logout,
-              ))
+              onPressed: _loggingOut
+                  ? null
+                  : () async {
+                      setState(() => _loggingOut = true);
+                      try {
+                        SyncRemoteDataSource a = SyncRemoteDataSourceImpl();
+                        await a.logout();
+                        navigate();
+                      } finally {
+                        if (mounted) setState(() => _loggingOut = false);
+                      }
+                    },
+              icon: _loggingOut
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white))
+                  : const Icon(
+                      Icons.logout,
+                    ))
         ],
       ),
       drawer: Drawer(
@@ -246,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               const SizedBox(height: 30),
-              const Text('Your expense chart for this month'),
+              const Text('Your expense chart for this month (tap to expand)'),
               const SizedBox(height: 30),
               Expanded(
                 child: BlocBuilder<ExpenseBloc, ExpenseState>(
@@ -266,7 +281,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         }
                       }
-                      return PieChart(
+                      return GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ExpenseChartPage(dataMap: dataMap))),
+                        child: PieChart(
                           dataMap: dataMap,
                           animationDuration: const Duration(milliseconds: 800),
                           chartLegendSpacing: 32,
@@ -278,7 +299,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             showLegendsInRow: false,
                             legendPosition: LegendPosition.right,
                             showLegends: true,
-                          ));
+                          ),
+                          // Amounts are shown in the full view instead.
+                          chartValuesOptions: const ChartValuesOptions(
+                            showChartValues: false,
+                          )));
                     } else {
                       return const Text('No expenses found');
                     }

@@ -1,6 +1,7 @@
 import 'package:expense_tracker/features/category/presentation/bloc/category_bloc.dart';
 import 'package:expense_tracker/features/expenses/presentation/bloc/expense_bloc/expense_bloc.dart';
 import 'package:expense_tracker/features/income/presentation/bloc/income_bloc/income_bloc.dart';
+import 'package:expense_tracker/features/sms_expenses/presentation/bloc/sms_transaction_bloc.dart';
 import 'package:expense_tracker/firebase_options.dart';
 import 'package:expense_tracker/login_screen.dart';
 import 'package:expense_tracker/main_app.dart';
@@ -34,6 +35,8 @@ class MyApp extends StatelessWidget {
         BlocProvider<ExpenseBloc>(create: (context) => ExpenseBloc()),
         BlocProvider<IncomeBloc>(create: (context) => IncomeBloc()),
         BlocProvider<CategoryBloc>(create: (context) => CategoryBloc()),
+        BlocProvider<SmsTransactionBloc>(
+            create: (context) => SmsTransactionBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
